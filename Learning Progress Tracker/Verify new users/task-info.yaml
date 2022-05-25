@@ -294,6 +294,62 @@ files:
         }
     }
   learner_created: false
+- name: src/tracker/CLI.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class CLI {
+        private CLI() {
+        }
+
+        static void run() {
+            while (true) {
+                listenToUserCommand();
+            }
+        }
+
+        private static void listenToUserCommand() {
+            String commandInput = Main.scanner.nextLine().trim().toUpperCase();
+            if (commandInput.equals("") || commandInput.matches("\\s+")) {
+                System.out.println("No input.");
+            } else if (isKnownCommand(commandInput)) {
+                runCommand(Command.valueOf(commandInput));
+            } else {
+                System.out.println("Error: unknown command!");
+            }
+        }
+
+        private static void runCommand(Command command) {
+            switch (command) {
+                case EXIT -> exit();
+            }
+        }
+
+        private static void exit() {
+            System.out.println("Bye!");
+            System.exit(0);
+        }
+
+        private static boolean isKnownCommand(String commandInput) {
+            try {
+                Command.valueOf(commandInput);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+  learner_created: true
+- name: src/tracker/Command.java
+  visible: true
+  text: |
+    package tracker;
+
+    public enum Command {
+        EXIT
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/197/stages/980/implement#comment
 status: Unchecked
-record: -1
+record: 2

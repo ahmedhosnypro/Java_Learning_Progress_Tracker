@@ -12,7 +12,7 @@ public class CLI {
 
     private static void listenToUserCommand() {
         String commandInput = Main.scanner.nextLine().trim().toUpperCase();
-        if (commandInput.equals("") || commandInput.matches("\\s+")) {
+        if (commandInput.isEmpty() || commandInput.isBlank()) {
             System.out.println("No input.");
         } else if (isKnownCommand(commandInput)) {
             runCommand(Command.valueOf(commandInput));
