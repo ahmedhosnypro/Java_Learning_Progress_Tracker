@@ -1,16 +1,5 @@
 type: edu
 files:
-- name: src/tracker/Main.java
-  visible: true
-  text: |
-    package tracker;
-
-    public class Main {
-        public static void main(String[] args) {
-            System.out.println("Hello, World!");
-        }
-    }
-  learner_created: false
 - name: build.gradle
   visible: true
   text: |
@@ -350,6 +339,29 @@ files:
         EXIT
     }
   learner_created: true
+- name: src/tracker/Student.java
+  visible: true
+  learner_created: true
+- name: src/tracker/DataSet.java
+  visible: true
+  learner_created: true
+- name: src/tracker/Main.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class Main {
+        public static void main(String[] args) {
+            System.out.println("Hello, World!");
+        }
+    }
+  learner_created: false
+- name: src/tracker/StudentBuilder.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/197/stages/980/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 25 May 2022 17:04:00 UTC
 record: 2
