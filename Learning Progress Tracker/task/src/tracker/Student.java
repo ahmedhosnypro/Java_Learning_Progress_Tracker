@@ -3,8 +3,8 @@ package tracker;
 public class Student {
 
     private final int id;
-    private String firstName;
-    private String lastName;
+    private final String firstName;
+    private final String lastName;
     private final String email;
 
     private int javaPoints = 0;
@@ -13,18 +13,22 @@ public class Student {
     private int springPoints = 0;
 
 
-    public Student(int id, String firstName, String lastName, String email) {
+    Student(int id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getEmail() {
+    String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    String getEmail() {
         return email;
     }
 
@@ -32,41 +36,40 @@ public class Student {
         return javaPoints;
     }
 
-    public int getDsaPoints() {
+    int getDsaPoints() {
         return dsaPoints;
     }
 
-    public int getDatabasesPoints() {
+    int getDatabasesPoints() {
         return databasesPoints;
     }
 
-    public int getSpringPoints() {
+    int getSpringPoints() {
         return springPoints;
     }
 
-    public void addJavaPoints(int javaPoints) {
+    void addJavaPoints(int javaPoints) {
         if (javaPoints > 0) {
             this.javaPoints += javaPoints;
         }
     }
 
-    public void addDsaPoints(int dsaPoints) {
+    void addDsaPoints(int dsaPoints) {
         if (dsaPoints > 0) {
             this.dsaPoints += dsaPoints;
         }
     }
 
-    public void addDatabasesPoints(int databasesPoints) {
+    void addDatabasesPoints(int databasesPoints) {
         if (databasesPoints > 0) {
             this.databasesPoints += databasesPoints;
         }
 
     }
 
-    public void addSpringPoints(int springPoints) {
+    void addSpringPoints(int springPoints) {
         if (springPoints > 0) {
             this.springPoints += springPoints;
         }
     }
-
 }

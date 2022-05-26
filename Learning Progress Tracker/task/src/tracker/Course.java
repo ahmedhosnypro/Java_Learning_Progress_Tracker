@@ -4,22 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Course {
-    JAVA("Java", 600, 0,  0, 0),
+    JAVA("Java", 600, 0, 0, 0),
     DSA("DSA", 400, 0, 0, 0),
     DATABASES("Databases", 480, 0, 0, 0),
-    SPRING("Spring", 550,  0, 0, 0);
+    SPRING("Spring", 550, 0, 0, 0);
     private final String notation;
-    private final double grade;
+    final double grade;
     private int learners;
     private int activity;
     private int avgScores;
 
     private static final List<Course> courses = List.of(Course.JAVA, Course.DSA, Course.DATABASES, Course.SPRING);
 
+    private List<List<String>> topStudents; // List.of(List.of(id, thisCoursePoints, completionPercentage))
+    private final List<List<String>> notifiedStudents = new ArrayList<>(); // List.of(List.of(email, fullName))
+    private final List<List<String>> nonNotifiedStudents = new ArrayList<>(); // List.of(List.of(email, fullName))
 
-    private List<List<String>> topStudents;
-
-    Course(String notation, double grade, int learners, int activity , int avgScores) {
+    Course(String notation, double grade, int learners, int activity, int avgScores) {
         this.notation = notation;
         this.grade = grade;
         this.learners = learners;
@@ -45,7 +46,7 @@ public enum Course {
         return notation;
     }
 
-    public double getGrade() {
+    double getGrade() {
         return grade;
     }
 
@@ -67,6 +68,23 @@ public enum Course {
 
     void setTopStudents(List<List<String>> topStudents) {
         this.topStudents = topStudents;
+    }
+
+    void updateNotifyList(List<List<String>> successStudents) {
+        for (var student : successStudents) {
+            if (!notifiedStudents.contains(student)) {
+                nonNotifiedStudents.add(student);
+            }
+        }
+    }
+
+    void clearNotificationList() {
+        notifiedStudents.addAll(nonNotifiedStudents);
+        nonNotifiedStudents.clear();
+    }
+
+    List<List<String>> getNonNotifiedStudents() {
+        return nonNotifiedStudents;
     }
 
     void setActivity(int activity) {

@@ -1447,12 +1447,9 @@ files:
         SPRING
     }
   learner_created: true
-- name: src/tracker/points.txt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/14399#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: Thu, 26 May 2022 16:27:48 UTC
-record: -1
+  time: Thu, 26 May 2022 16:30:31 UTC
+record: 4

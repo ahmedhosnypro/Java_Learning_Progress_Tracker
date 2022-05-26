@@ -32,6 +32,7 @@ public class CLI {
             case ADD_POINTS -> addPoints();
             case FIND -> find();
             case STATISTICS -> statistics();
+            case NOTIFY -> notifySuccessStudents();
             case BACK -> back();
             case EXIT -> exit();
         }
@@ -108,6 +109,10 @@ public class CLI {
                 statistics.courseStatistics(input);
             }
         }
+    }
+
+    private static void notifySuccessStudents() {
+        Notification.notifySuccessStudents();
     }
 
     private static void back() {

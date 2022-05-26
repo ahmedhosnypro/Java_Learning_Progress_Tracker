@@ -55,6 +55,7 @@ public class DataSet {
         updateActivity(points);
         updateAvgScores();
         updateTopStudents();
+        updateNotificationList();
     }
 
     private void updateLearners() {
@@ -116,6 +117,33 @@ public class DataSet {
                     .sorted((Comparator.comparingInt(Student::getSpringPoints)).reversed())
                     .map(s -> List.of(String.valueOf(s.getId()), String.valueOf(s.getSpringPoints()),
                             decimalFormat.format((s.getSpringPoints() / Course.SPRING.getGrade()) * 100L) + "%"))
+                    .toList());
+        }
+    }
+
+    private void updateNotificationList() {
+        if (javaLearnersCount() != 0) {
+            Course.JAVA.updateNotifyList(students.stream()
+                    .filter(s -> s.getJavaPoints() == Course.JAVA.getGrade())
+                    .map(s -> List.of(s.getEmail(), s.getFullName()))
+                    .toList());
+        }
+        if (dsaLearnersCount() != 0) {
+            Course.DSA.updateNotifyList(students.stream()
+                    .filter(s -> s.getDsaPoints() == Course.DSA.getGrade())
+                    .map(s -> List.of(s.getEmail(), s.getFullName()))
+                    .toList());
+        }
+        if (databasesLearnersCount() != 0) {
+            Course.DATABASES.updateNotifyList(students.stream()
+                    .filter(s -> s.getDatabasesPoints() == Course.DATABASES.getGrade())
+                    .map(s -> List.of(s.getEmail(), s.getFullName()))
+                    .toList());
+        }
+        if (springLearnersCount() != 0) {
+            Course.SPRING.updateNotifyList(students.stream()
+                    .filter(s -> s.getSpringPoints() == Course.SPRING.getGrade())
+                    .map(s -> List.of(s.getEmail(), s.getFullName()))
                     .toList());
         }
     }

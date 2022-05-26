@@ -1035,6 +1035,855 @@ files:
         }
     }
   learner_created: false
+- name: src/tracker/Statistics.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class Statistics {
+        private static final String NA = "n/a";
+        private final List<String> mostPopularCourses = new ArrayList<>();
+        private final List<String> leastPopularCourses = new ArrayList<>();
+        private final List<String> highestActivityCourses = new ArrayList<>();
+        private final List<String> lowestActivityCourses = new ArrayList<>();
+        private final List<String> easiestCourses = new ArrayList<>();
+        private final List<String> hardestCourses = new ArrayList<>();
+
+        Statistics() {
+        }
+
+        void generalStatistics() {
+            StringBuilder out = new StringBuilder();
+            mostPopular(out);
+            leastPopular(out);
+            highestActivity(out);
+            lowestActivity(out);
+            easiestCourses(out);
+            hardestCourses(out);
+
+            Main.updateLog(out.toString());
+            System.out.println(Main.lastLog);
+        }
+
+        void courseStatistics(String courseNotation) {
+            Course course = Course.getCourses(courseNotation);
+            if (course != null) {
+                StringBuilder out = new StringBuilder(course.getNotation());
+                out.append("\n").append("id    points    completed").append("\n");
+                if (course.getLearners() != 0) {
+                    course.getTopStudents()
+                            .forEach(ts -> out.append(ts.get(0)).append("\t").append(ts.get(1)).append("\t").append(ts.get(2)).append("\n"));
+                }
+                Main.updateLog(out.toString());
+                System.out.println(Main.lastLog);
+            } else {
+                Main.updateLog("Unknown course");
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private void mostPopular(StringBuilder out) {
+            int mostPopularity = 0;
+            for (var course : Course.getCourses()) {
+                if (course.getLearners() > mostPopularity) {
+                    mostPopularity = course.getLearners();
+                    mostPopularCourses.clear();
+                    mostPopularCourses.add(course.getNotation());
+                } else if (course.getLearners() == mostPopularity && course.getLearners() != 0) {
+                    mostPopularCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Most popular: ", mostPopularCourses);
+        }
+
+        private void leastPopular(StringBuilder out) {
+            int leastPopularity = Integer.MAX_VALUE;
+            for (var course : Course.getCourses()) {
+                if (course.getLearners() < leastPopularity && course.getLearners() > 0) {
+                    leastPopularity = course.getLearners();
+                    leastPopularCourses.clear();
+                    if (!mostPopularCourses.contains(course.getNotation())) {
+                        leastPopularCourses.add(course.getNotation());
+                    }
+                } else if (course.getLearners() == leastPopularity && !mostPopularCourses.contains(course.getNotation())) {
+                    leastPopularCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Least popular: ", leastPopularCourses);
+        }
+
+        private void highestActivity(StringBuilder out) {
+            int highestActivity = 0;
+            for (var course : Course.getCourses()) {
+                if (course.getActivity() > highestActivity) {
+                    highestActivity = course.getActivity();
+                    highestActivityCourses.clear();
+                    highestActivityCourses.add(course.getNotation());
+                } else if (course.getActivity() == highestActivity && course.getActivity() != 0) {
+                    highestActivityCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Highest activity: ", highestActivityCourses);
+        }
+
+        private void lowestActivity(StringBuilder out) {
+            int lowestActivity = Integer.MAX_VALUE;
+            for (var course : Course.getCourses()) {
+                if (course.getActivity() < lowestActivity && course.getActivity() > 0) {
+                    lowestActivity = course.getActivity();
+                    lowestActivityCourses.clear();
+                    if (!highestActivityCourses.contains(course.getNotation())) {
+                        lowestActivityCourses.add(course.getNotation());
+                    }
+                } else if (course.getActivity() == lowestActivity && !highestActivityCourses.contains(course.getNotation())) {
+                    lowestActivityCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Lowest activity: ", lowestActivityCourses);
+        }
+
+        private void easiestCourses(StringBuilder out) {
+            int highestAvgScore = 0;
+            for (var course : Course.getCourses()) {
+                if (course.getAvgScores() > highestAvgScore) {
+                    highestAvgScore = course.getAvgScores();
+                    easiestCourses.clear();
+                    easiestCourses.add(course.getNotation());
+                } else if (course.getAvgScores() == highestAvgScore && course.getAvgScores() != 0) {
+                    easiestCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Easiest course: ", easiestCourses);
+        }
+
+        private void hardestCourses(StringBuilder out) {
+            int leastAvgScore = Integer.MAX_VALUE;
+            for (var course : Course.getCourses()) {
+                if (course.getAvgScores() < leastAvgScore && course.getAvgScores() > 0) {
+                    leastAvgScore = course.getAvgScores();
+                    hardestCourses.clear();
+                    if (!easiestCourses.contains(course.getNotation())) {
+                        hardestCourses.add(course.getNotation());
+                    }
+                } else if (course.getAvgScores() == leastAvgScore && !easiestCourses.contains(course.getNotation())) {
+                    hardestCourses.add(course.getNotation());
+                }
+            }
+
+            appendDetails(out, "Hardest course ", hardestCourses);
+        }
+
+        private void appendDetails(StringBuilder out, String header, List<String> details) {
+            out.append(header);
+            if (details.isEmpty()) {
+                out.append(NA);
+            } else {
+                details.forEach(c -> out.append(c).append(", "));
+                out.delete(out.length() - 2, out.length());
+            }
+            out.append("\n");
+        }
+    }
+  learner_created: true
+- name: src/tracker/CLI.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class CLI {
+        private CLI() {
+        }
+
+        private static boolean toContinue = true;
+
+        static void run() {
+            while (toContinue) {
+                listenToUserCommand();
+            }
+        }
+
+        private static void listenToUserCommand() {
+            String commandInput = Main.scanner.nextLine().trim().toUpperCase();
+            if (commandInput.isEmpty() || commandInput.isBlank()) {
+                Main.lastLog = "No input.";
+                System.out.println(Main.lastLog);
+            } else if (isKnownCommand(commandInput)) {
+                runCommand(Command.getCommand(commandInput));
+            } else {
+                Main.lastLog = "Error: unknown command!";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private static void runCommand(Command command) {
+            switch (command) {
+                case ADD_STUDENTS -> addStudents();
+                case LIST -> list();
+                case ADD_POINTS -> addPoints();
+                case FIND -> find();
+                case STATISTICS -> statistics();
+                case BACK -> back();
+                case EXIT -> exit();
+            }
+        }
+
+        private static void addStudents() {
+            Main.lastLog = "Enter student credentials or 'back' to return:";
+            System.out.println(Main.lastLog);
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    Main.lastLog = "Total " + Main.data.getSize() + " students have been added.";
+                    System.out.println(Main.lastLog);
+                    break;
+                } else {
+                    StudentBuilder.createNewStudent(partCredentials(input));
+                }
+            }
+        }
+
+        private static void list() {
+            if (Main.data.getSize() == 0) {
+                Main.lastLog = "No students found";
+                System.out.println(Main.lastLog);
+                return;
+            }
+
+            StringBuilder out = new StringBuilder("Students:\n");
+            Main.data.getIdList().forEach(id -> out.append(id).append("\n"));
+
+            Main.lastLog = out.toString();
+            System.out.println(Main.lastLog);
+        }
+
+        private static void addPoints() {
+            Main.lastLog = "Enter an id and points or 'back' to return";
+            System.out.println(Main.lastLog);
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    break;
+                } else {
+                    Points.addPoints(partPoints(input));
+                }
+            }
+        }
+
+        private static void find() {
+            Main.lastLog = "Enter an id or 'back' to return";
+            System.out.println(Main.lastLog);
+
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    break;
+                } else {
+                    Points.find(input);
+                }
+            }
+        }
+
+        private static void statistics() {
+            Main.lastLog = "Type the name of a course to see details or 'back' to quit:";
+            System.out.println(Main.lastLog);
+
+            Statistics statistics = new Statistics();
+            statistics.generalStatistics();
+
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    break;
+                } else {
+                    statistics.courseStatistics(input);
+                }
+            }
+        }
+
+        private static void back() {
+            Main.lastLog = "Enter 'exit' to exit the program.";
+            System.out.println(Main.lastLog);
+        }
+
+        private static void exit() {
+            Main.lastLog = "Bye!";
+            System.out.println(Main.lastLog);
+            toContinue = false;
+            System.exit(0);
+        }
+
+        private static boolean isKnownCommand(String commandInput) {
+            try {
+                Command.getCommand(commandInput);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        private static String[] partCredentials(String input) {
+            String[] args = input.split(" ");
+
+            if (args.length > 3) {
+                String[] ret = new String[3];
+                ret[0] = args[0];
+                ret[1] = "";
+                ret[2] = args[args.length - 1];
+                for (int i = 1; i < args.length - 2; i++) {
+                    ret[1] += args[i] + " ";
+                }
+                ret[1] = ret[1].trim();
+                return ret;
+            }
+            return args;
+        }
+
+        private static String[] partPoints(String input) {
+            return input.split(" ");
+        }
+    }
+  learner_created: true
+- name: src/tracker/Student.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class Student {
+
+        private final int id;
+        private String firstName;
+        private String lastName;
+        private final String email;
+
+        private int javaPoints = 0;
+        private int dsaPoints = 0;
+        private int databasesPoints = 0;
+        private int springPoints = 0;
+
+
+        public Student(int id, String firstName, String lastName, String email) {
+            this.id = id;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.email = email;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public int getJavaPoints() {
+            return javaPoints;
+        }
+
+        public int getDsaPoints() {
+            return dsaPoints;
+        }
+
+        public int getDatabasesPoints() {
+            return databasesPoints;
+        }
+
+        public int getSpringPoints() {
+            return springPoints;
+        }
+
+        public void addJavaPoints(int javaPoints) {
+            if (javaPoints > 0) {
+                this.javaPoints += javaPoints;
+            }
+        }
+
+        public void addDsaPoints(int dsaPoints) {
+            if (dsaPoints > 0) {
+                this.dsaPoints += dsaPoints;
+            }
+        }
+
+        public void addDatabasesPoints(int databasesPoints) {
+            if (databasesPoints > 0) {
+                this.databasesPoints += databasesPoints;
+            }
+
+        }
+
+        public void addSpringPoints(int springPoints) {
+            if (springPoints > 0) {
+                this.springPoints += springPoints;
+            }
+        }
+
+    }
+  learner_created: true
+- name: src/tracker/DataSet.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.math.RoundingMode;
+    import java.text.DecimalFormat;
+    import java.util.ArrayList;
+    import java.util.Comparator;
+    import java.util.List;
+
+    public class DataSet {
+        private final ArrayList<Student> students = new ArrayList<>();
+
+        private final DecimalFormat decimalFormat = new DecimalFormat();
+
+        void addStudent(Student student) {
+            students.add(student);
+        }
+
+        void addPoints(int[] points) {
+            var optStudent = students.stream().filter(s -> s.getId() == points[0]).findFirst();
+            if (optStudent.isPresent()) {
+                var s = optStudent.get();
+                s.addJavaPoints(points[1]);
+                s.addDsaPoints(points[2]);
+                s.addDatabasesPoints(points[3]);
+                s.addSpringPoints(points[4]);
+
+                updateStatistics(points);
+            }
+        }
+
+        List<Integer> getIdList() {
+            return students.stream().map(Student::getId).toList();
+        }
+
+        List<String> getEmailList() {
+            return students.stream().map(Student::getEmail).toList();
+        }
+
+        int getSize() {
+            return students.size();
+        }
+
+        String find(int id) {
+            var optStudent = students.stream().filter(s -> s.getId() == id).findFirst();
+            if (optStudent.isPresent()) {
+                var s = optStudent.get();
+                return String.format("%d points: Java=%d; DSA=%d; Databases=%d; Spring=%d",
+                        id, s.getJavaPoints(), s.getDsaPoints(), s.getDatabasesPoints(), s.getSpringPoints());
+            }
+            return "No student is found for id=" + id;
+        }
+
+        private void updateStatistics(int[] points) {
+            updateLearners();
+            updateActivity(points);
+            updateAvgScores();
+            updateTopStudents();
+        }
+
+        private void updateLearners() {
+            Course.JAVA.setLearners(javaLearnersCount());
+            Course.DSA.setLearners(dsaLearnersCount());
+            Course.DATABASES.setLearners(databasesLearnersCount());
+            Course.SPRING.setLearners(springLearnersCount());
+        }
+
+        private void updateActivity(int[] points) {
+            Course.JAVA.setActivity(points[0] > 0 ? Course.JAVA.getActivity() + 1 : Course.JAVA.getActivity());
+            Course.DSA.setActivity(points[0] > 0 ? Course.DSA.getActivity() + 1 : Course.DSA.getActivity());
+            Course.DATABASES.setActivity(points[0] > 0 ? Course.DATABASES.getActivity() + 1 : Course.DATABASES.getActivity());
+            Course.SPRING.setActivity(points[0] > 0 ? Course.SPRING.getActivity() + 1 : Course.SPRING.getActivity());
+        }
+
+        private void updateAvgScores() {
+            Course.JAVA.setAvgScores(javaLearnersCount() == 0 ? 0 : javaTotalScores() / javaLearnersCount());
+            Course.DSA.setAvgScores(dsaLearnersCount() == 0 ? 0 : dsaTotalScores() / dsaLearnersCount());
+            Course.DATABASES.setAvgScores(databasesLearnersCount() == 0 ? 0 : databasesTotalScores() / databasesLearnersCount());
+            Course.SPRING.setAvgScores(springLearnersCount() == 0 ? 0 : springTotalSores() / springLearnersCount());
+        }
+
+        private void updateTopStudents() {
+            decimalFormat.setRoundingMode(RoundingMode.HALF_UP);
+            decimalFormat.setMaximumFractionDigits(1);
+            decimalFormat.setMinimumFractionDigits(1);
+            if (javaLearnersCount() != 0) {
+                Course.JAVA.setTopStudents(students.stream()
+                        .filter(s -> s.getJavaPoints() > 0)
+                        .sorted(Comparator.comparingInt(Student::getId))
+                        .sorted((Comparator.comparingInt(Student::getJavaPoints)).reversed())
+                        .map(s -> List.of(String.valueOf(s.getId()), String.valueOf(s.getJavaPoints()),
+                                decimalFormat.format((s.getJavaPoints() / Course.JAVA.getGrade()) * 100L) + "%"))
+                        .toList());
+            }
+            if (dsaLearnersCount() != 0) {
+                Course.DSA.setTopStudents(students.stream()
+                        .filter(s -> s.getDsaPoints() > 0)
+                        .sorted(Comparator.comparingInt(Student::getId))
+                        .sorted((Comparator.comparingInt(Student::getDsaPoints)).reversed())
+                        .map(s -> List.of(String.valueOf(s.getId()), String.valueOf(s.getDsaPoints()),
+                                decimalFormat.format((s.getDsaPoints() / Course.DSA.getGrade()) * 100L) + "%"))
+                        .toList());
+            }
+            if (databasesLearnersCount() != 0) {
+                Course.DATABASES.setTopStudents(students.stream()
+                        .filter(s -> s.getDatabasesPoints() > 0)
+                        .sorted(Comparator.comparingInt(Student::getId))
+                        .sorted((Comparator.comparingInt(Student::getDatabasesPoints)).reversed())
+                        .map(s -> List.of(String.valueOf(s.getId()), String.valueOf(s.getDatabasesPoints()),
+                                decimalFormat.format((s.getDatabasesPoints() / Course.DATABASES.getGrade()) * 100L) + "%"))
+                        .toList());
+            }
+            if (springLearnersCount() != 0) {
+                Course.SPRING.setTopStudents(students.stream()
+                        .filter(s -> s.getSpringPoints() > 0)
+                        .sorted(Comparator.comparingInt(Student::getId))
+                        .sorted((Comparator.comparingInt(Student::getSpringPoints)).reversed())
+                        .map(s -> List.of(String.valueOf(s.getId()), String.valueOf(s.getSpringPoints()),
+                                decimalFormat.format((s.getSpringPoints() / Course.SPRING.getGrade()) * 100L) + "%"))
+                        .toList());
+            }
+        }
+
+        int javaLearnersCount() {
+            return (int) students.stream().filter(s -> s.getJavaPoints() > 0).count();
+        }
+
+        int dsaLearnersCount() {
+            return (int) students.stream().filter(s -> s.getDsaPoints() > 0).count();
+        }
+
+        int databasesLearnersCount() {
+            return (int) students.stream().filter(s -> s.getDatabasesPoints() > 0).count();
+        }
+
+        int springLearnersCount() {
+            return (int) students.stream().filter(s -> s.getSpringPoints() > 0).count();
+        }
+
+        int javaTotalScores() {
+            return students.stream().mapToInt(Student::getJavaPoints).sum();
+        }
+
+        int dsaTotalScores() {
+            return students.stream().mapToInt(Student::getDsaPoints).sum();
+        }
+
+        int databasesTotalScores() {
+            return students.stream().mapToInt(Student::getDatabasesPoints).sum();
+        }
+
+        int springTotalSores() {
+            return students.stream().mapToInt(Student::getSpringPoints).sum();
+        }
+    }
+  learner_created: true
+- name: src/tracker/Points.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.Arrays;
+
+    public class Points {
+
+        private static final String ERR_MSG = "Incorrect points format.";
+        private static final String NOT_FOUND = "No student is found for id=";
+
+        private Points() {
+        }
+
+        static void find(String input) {
+            try {
+                int id = Integer.parseInt(input);
+                if (Main.data.getIdList().contains(id)) {
+                    Main.lastLog = Main.data.find(id);
+                    System.out.println(Main.lastLog);
+                } else {
+                    Main.lastLog = NOT_FOUND + input;
+                    System.out.println(Main.lastLog);
+                }
+            } catch (IllegalArgumentException e) {
+                Main.lastLog = NOT_FOUND + input; // should not valid id
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        static void addPoints(String[] strPoints) {
+            if (!isInValidPoints(strPoints)) {
+                int[] points = Arrays.stream(strPoints).mapToInt(Integer::parseInt).toArray();
+                Main.data.addPoints(points);
+                Main.lastLog = "Points updated.";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+
+        private static boolean isInValidPoints(String[] strPoints) {
+            if (strPoints.length != 5) {
+                Main.lastLog = ERR_MSG;
+                System.out.println(Main.lastLog);
+                return true;
+            } else {
+                int[] points;
+                try {
+                    Integer.parseInt(strPoints[0]);
+                } catch (IllegalArgumentException e) {
+                    Main.lastLog = NOT_FOUND + strPoints[0];
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                try {
+                    points = Arrays.stream(strPoints).mapToInt(Integer::parseInt).toArray();
+                    if (isNotExistingStudent(points[0])) {
+                        Main.lastLog = NOT_FOUND+ points[0];
+                        System.out.println(Main.lastLog);
+                        return true;
+                    }
+                    if (isInValidPoints(points)) {
+                        Main.lastLog = ERR_MSG;
+                        System.out.println(Main.lastLog);
+                        return true;
+                    }
+                } catch (IllegalArgumentException e) {
+                    Main.lastLog = ERR_MSG;
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private static boolean isNotExistingStudent(int id) {
+            return !Main.data.getIdList().contains(id);
+        }
+
+        private static boolean isInValidPoints(int[] points) {
+            return Arrays.stream(points).anyMatch(p -> p < 0);
+        }
+    }
+  learner_created: true
+- name: src/tracker/StudentBuilder.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.Random;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class StudentBuilder {
+        private static final String NAME_REGEX = "([a-zA-Z]{2})|^[a-zA-Z][-'a-zA-Z ]+[a-zA-Z]$";
+        private static final String ADJACENT_CHARACTERS_REGEX = "-{2,}|'{2,}|-'|'-|_{2,}|\\.{2,}";
+        private static final String EMAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
+        private static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
+        private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+        private static final Pattern ADJACENT_PATTERN = Pattern.compile(ADJACENT_CHARACTERS_REGEX);
+        private static final Random random = new Random();
+        private static final int ID_LENGTH = 6;
+
+        private StudentBuilder() {
+        }
+
+        static void createNewStudent(String[] credentials) {
+            if (!isInValidCredentials(credentials)) {
+                Main.data.addStudent(new Student(createNewId(), credentials[0], credentials[1], credentials[2]));
+                Main.lastLog = "The student has been added.";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private static int createNewId() {
+            StringBuilder idBuilder = new StringBuilder("1");
+            for (int i = 0; i < ID_LENGTH - 1; i++) {
+                idBuilder.append(random.nextInt(9));
+            }
+            int id = Integer.parseInt(idBuilder.toString());
+            if (Main.data.getIdList().contains(id)) {
+                return createNewId();
+            }
+            return id;
+        }
+
+
+        private static boolean isInValidCredentials(String[] credentials) {
+            if (credentials.length != 3) {
+                Main.lastLog = "Incorrect credentials.";
+                System.out.println(Main.lastLog);
+                return true;
+            } else {
+                if (isInValidName(credentials[0])) {
+                    Main.lastLog = "Incorrect first name.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isInValidName(credentials[1])) {
+                    Main.lastLog = "Incorrect last name.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isInValidEmail(credentials[2])) {
+                    Main.lastLog = "Incorrect email.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isTakenEmail(credentials[2])) {
+                    Main.lastLog = "This email is already taken.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+
+        private static boolean isTakenEmail(String email) {
+            return Main.data.getEmailList().contains(email);
+        }
+
+        private static boolean isInValidName(String name) {
+            Matcher nameMatcher = NAME_PATTERN.matcher(name);
+            Matcher adjacentCharacterMatcher = ADJACENT_PATTERN.matcher(name);
+            if (nameMatcher.matches()) {
+                return adjacentCharacterMatcher.find();
+            } else {
+                return true;
+            }
+        }
+
+        private static boolean isInValidEmail(String email) {
+            Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
+            Matcher adjacentCharacterMatcher = ADJACENT_PATTERN.matcher(email);
+            if (emailMatcher.matches()) {
+                return adjacentCharacterMatcher.find();
+            } else {
+                return true;
+            }
+        }
+
+
+    }
+  learner_created: true
+- name: src/tracker/Command.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.List;
+
+    public enum Command {
+        ADD_STUDENTS,
+        LIST,
+        ADD_POINTS,
+        FIND,
+        STATISTICS,
+        BACK,
+        EXIT;
+
+        private static final List<String> spaceCommands = List.of("add students", "add points");
+
+        static Command getCommand(String command) {
+            if (spaceCommands.contains(command.toLowerCase())) {
+                return Command.valueOf(command.replace(" ", "_"));
+            }
+            return Command.valueOf(command);
+        }
+    }
+  learner_created: true
+- name: src/tracker/Course.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public enum Course {
+        JAVA("Java", 600, 0,  0, 0),
+        DSA("DSA", 400, 0, 0, 0),
+        DATABASES("Databases", 480, 0, 0, 0),
+        SPRING("Spring", 550,  0, 0, 0);
+        private final String notation;
+        private final double grade;
+        private int learners;
+        private int activity;
+        private int avgScores;
+
+        private static final List<Course> courses = List.of(Course.JAVA, Course.DSA, Course.DATABASES, Course.SPRING);
+
+
+        private List<List<String>> topStudents;
+
+        Course(String notation, double grade, int learners, int activity , int avgScores) {
+            this.notation = notation;
+            this.grade = grade;
+            this.learners = learners;
+            this.activity = activity;
+            this.avgScores = avgScores;
+        }
+
+
+        static List<Course> getCourses() {
+            return courses;
+        }
+
+        static Course getCourses(String notation) {
+            var optCourse = courses.stream().filter(c -> notation.equalsIgnoreCase(c.notation)).findFirst();
+            return optCourse.orElse(null);
+        }
+
+        public List<List<String>> getTopStudents() {
+            return new ArrayList<>(topStudents);
+        }
+
+        String getNotation() {
+            return notation;
+        }
+
+        public double getGrade() {
+            return grade;
+        }
+
+        int getLearners() {
+            return learners;
+        }
+
+        int getActivity() {
+            return activity;
+        }
+
+        int getAvgScores() {
+            return avgScores;
+        }
+
+        void setLearners(int learners) {
+            this.learners = learners;
+        }
+
+        void setTopStudents(List<List<String>> topStudents) {
+            this.topStudents = topStudents;
+        }
+
+        void setActivity(int activity) {
+            this.activity = activity;
+        }
+
+        void setAvgScores(int avgScores) {
+            this.avgScores = avgScores;
+        }
+    }
+  learner_created: true
+- name: src/tracker/Notification.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/14400#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Thu, 26 May 2022 18:04:41 UTC
+record: 5

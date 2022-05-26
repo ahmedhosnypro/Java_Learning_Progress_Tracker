@@ -8,6 +8,7 @@ public enum Command {
     ADD_POINTS,
     FIND,
     STATISTICS,
+    NOTIFY,
     BACK,
     EXIT;
 
