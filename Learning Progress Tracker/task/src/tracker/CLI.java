@@ -1,5 +1,7 @@
 package tracker;
 
+import java.util.Arrays;
+
 public class CLI {
     private CLI() {
     }
@@ -15,42 +17,91 @@ public class CLI {
     private static void listenToUserCommand() {
         String commandInput = Main.scanner.nextLine().trim().toUpperCase();
         if (commandInput.isEmpty() || commandInput.isBlank()) {
-            System.out.println("No input.");
+            Main.lastLog = "No input.";
+            System.out.println(Main.lastLog);
         } else if (isKnownCommand(commandInput)) {
             runCommand(Command.getCommand(commandInput));
         } else {
-            System.out.println("Error: unknown command!");
+            Main.lastLog = "Error: unknown command!";
+            System.out.println(Main.lastLog);
         }
     }
 
     private static void runCommand(Command command) {
         switch (command) {
             case ADD_STUDENTS -> addStudents();
+            case LIST -> list();
+            case ADD_POINTS -> addPoints();
+            case FIND -> find();
             case BACK -> back();
             case EXIT -> exit();
         }
     }
 
     private static void addStudents() {
-        System.out.println("Enter student credentials or 'back' to return:");
+        Main.lastLog = "Enter student credentials or 'back' to return:";
+        System.out.println(Main.lastLog);
         while (true) {
             String input = Main.scanner.nextLine().trim();
-            if (isKnownCommand(input.toUpperCase()) &&
-                    Command.getCommand(input.toUpperCase()) == Command.BACK) {
-                System.out.println("Total " + Main.data.studentsCnt() + " students have been added.");
+            if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                Main.lastLog = "Total " + Main.data.getSize() + " students have been added.";
+                System.out.println(Main.lastLog);
                 break;
             } else {
-                StudentBuilder.createNewStudent(input);
+                StudentBuilder.createNewStudent(partCredentials(input));
+            }
+        }
+    }
+
+    private static void list() {
+        if (Main.data.getSize() == 0) {
+            Main.lastLog = "No students found";
+            System.out.println(Main.lastLog);
+            return;
+        }
+
+        StringBuilder out = new StringBuilder("Students:\n");
+        Main.data.getIdList().forEach(id -> out.append(id).append("\n"));
+
+        Main.lastLog = out.toString();
+        System.out.println(Main.lastLog);
+    }
+
+    private static void addPoints() {
+        Main.lastLog = "Enter an id and points or 'back' to return";
+        System.out.println(Main.lastLog);
+        while (true) {
+            String input = Main.scanner.nextLine().trim();
+            if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                break;
+            } else {
+                Points.addPoints(partPoints(input));
+            }
+        }
+    }
+
+    private static void find() {
+        Main.lastLog = "Enter an id or 'back' to return";
+        System.out.println(Main.lastLog);
+
+        while (true) {
+            String input = Main.scanner.nextLine().trim();
+            if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                break;
+            } else {
+                Points.find(input);
             }
         }
     }
 
     private static void back() {
-        System.out.println("Enter 'exit' to exit the program.");
+        Main.lastLog = "Enter 'exit' to exit the program.";
+        System.out.println(Main.lastLog);
     }
 
     private static void exit() {
-        System.out.println("Bye!");
+        Main.lastLog = "Bye!";
+        System.out.println(Main.lastLog);
         toContinue = false;
         System.exit(0);
     }
@@ -62,5 +113,26 @@ public class CLI {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static String[] partCredentials(String input) {
+        String[] args = input.split(" ");
+
+        if (args.length > 3) {
+            String[] ret = new String[3];
+            ret[0] = args[0];
+            ret[1] = "";
+            ret[2] = args[args.length - 1];
+            for (int i = 1; i < args.length - 2; i++) {
+                ret[1] += args[i] + " ";
+            }
+            ret[1] = ret[1].trim();
+            return ret;
+        }
+        return args;
+    }
+
+    private static String[] partPoints(String input) {
+        return input.split(" ");
     }
 }

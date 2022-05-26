@@ -1,3 +1,8 @@
 content:
 - Comments
 - Unit testing with JUnit
+- LinkedList vs. ArrayList
+- HashMap
+- Choosing the right collection
+- Test lifecycle annotations
+- Parameterized test
