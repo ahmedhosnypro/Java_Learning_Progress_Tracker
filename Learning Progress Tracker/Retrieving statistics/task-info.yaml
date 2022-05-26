@@ -957,6 +957,502 @@ files:
         }
     }
   learner_created: false
+- name: src/tracker/CLI.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.Arrays;
+
+    public class CLI {
+        private CLI() {
+        }
+
+        private static boolean toContinue = true;
+
+        static void run() {
+            while (toContinue) {
+                listenToUserCommand();
+            }
+        }
+
+        private static void listenToUserCommand() {
+            String commandInput = Main.scanner.nextLine().trim().toUpperCase();
+            if (commandInput.isEmpty() || commandInput.isBlank()) {
+                Main.lastLog = "No input.";
+                System.out.println(Main.lastLog);
+            } else if (isKnownCommand(commandInput)) {
+                runCommand(Command.getCommand(commandInput));
+            } else {
+                Main.lastLog = "Error: unknown command!";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private static void runCommand(Command command) {
+            switch (command) {
+                case ADD_STUDENTS -> addStudents();
+                case LIST -> list();
+                case ADD_POINTS -> addPoints();
+                case FIND -> find();
+                case BACK -> back();
+                case EXIT -> exit();
+            }
+        }
+
+        private static void addStudents() {
+            Main.lastLog = "Enter student credentials or 'back' to return:";
+            System.out.println(Main.lastLog);
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    Main.lastLog = "Total " + Main.data.getSize() + " students have been added.";
+                    System.out.println(Main.lastLog);
+                    break;
+                } else {
+                    StudentBuilder.createNewStudent(partCredentials(input));
+                }
+            }
+        }
+
+        private static void list() {
+            if (Main.data.getSize() == 0) {
+                Main.lastLog = "No students found";
+                System.out.println(Main.lastLog);
+                return;
+            }
+
+            StringBuilder out = new StringBuilder("Students:\n");
+            Main.data.getIdList().forEach(id -> out.append(id).append("\n"));
+
+            Main.lastLog = out.toString();
+            System.out.println(Main.lastLog);
+        }
+
+        private static void addPoints() {
+            Main.lastLog = "Enter an id and points or 'back' to return";
+            System.out.println(Main.lastLog);
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    break;
+                } else {
+                    Points.addPoints(partPoints(input));
+                }
+            }
+        }
+
+        private static void find() {
+            Main.lastLog = "Enter an id or 'back' to return";
+            System.out.println(Main.lastLog);
+
+            while (true) {
+                String input = Main.scanner.nextLine().trim();
+                if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                    break;
+                } else {
+                    Points.find(input);
+                }
+            }
+        }
+
+        private static void back() {
+            Main.lastLog = "Enter 'exit' to exit the program.";
+            System.out.println(Main.lastLog);
+        }
+
+        private static void exit() {
+            Main.lastLog = "Bye!";
+            System.out.println(Main.lastLog);
+            toContinue = false;
+            System.exit(0);
+        }
+
+        private static boolean isKnownCommand(String commandInput) {
+            try {
+                Command.getCommand(commandInput);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        private static String[] partCredentials(String input) {
+            String[] args = input.split(" ");
+
+            if (args.length > 3) {
+                String[] ret = new String[3];
+                ret[0] = args[0];
+                ret[1] = "";
+                ret[2] = args[args.length - 1];
+                for (int i = 1; i < args.length - 2; i++) {
+                    ret[1] += args[i] + " ";
+                }
+                ret[1] = ret[1].trim();
+                return ret;
+            }
+            return args;
+        }
+
+        private static String[] partPoints(String input) {
+            return input.split(" ");
+        }
+    }
+  learner_created: true
+- name: src/tracker/Student.java
+  visible: true
+  text: |
+    package tracker;
+
+    public class Student {
+
+        private final int id;
+        private String firstName;
+        private String lastName;
+        private final String email;
+
+        private int javaPoints = 0;
+        private int dsaPoints = 0;
+        private int databasesPoints = 0;
+        private int springPoints = 0;
+
+
+        public Student(int id, String firstName, String lastName, String email) {
+            this.id = id;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.email = email;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public int getJavaPoints() {
+            return javaPoints;
+        }
+
+        public int getDsaPoints() {
+            return dsaPoints;
+        }
+
+        public int getDatabasesPoints() {
+            return databasesPoints;
+        }
+
+        public int getSpringPoints() {
+            return springPoints;
+        }
+
+        public void addJavaPoints(int javaPoints) {
+            if (javaPoints > 0) {
+                this.javaPoints += javaPoints;
+            }
+        }
+
+        public void addDsaPoints(int dsaPoints) {
+            if (dsaPoints > 0) {
+                this.dsaPoints += dsaPoints;
+            }
+        }
+
+        public void addDatabasesPoints(int databasesPoints) {
+            if (databasesPoints > 0) {
+                this.databasesPoints += databasesPoints;
+            }
+
+        }
+
+        public void addSpringPoints(int springPoints) {
+            if (springPoints > 0) {
+                this.springPoints += springPoints;
+            }
+        }
+
+    }
+  learner_created: true
+- name: src/tracker/DataSet.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class DataSet {
+        private final ArrayList<Student> students = new ArrayList<>();
+
+
+        void addStudent(Student student) {
+            students.add(student);
+        }
+
+        void addPoints(int[] points) {
+            var optStudent = students.stream().filter(s -> s.getId() == points[0]).findFirst();
+            if (optStudent.isPresent()) {
+                var s = optStudent.get();
+                s.addJavaPoints(points[1]);
+                s.addDsaPoints(points[2]);
+                s.addDatabasesPoints(points[3]);
+                s.addSpringPoints(points[4]);
+            }
+        }
+
+        List<Integer> getIdList() {
+            return students.stream().map(Student::getId).toList();
+        }
+
+        List<String> getEmailList() {
+            return students.stream().map(Student::getEmail).toList();
+        }
+
+        int getSize() {
+            return students.size();
+        }
+
+        String find(int id) {
+            var optStudent = students.stream().filter(s -> s.getId() == id).findFirst();
+            if (optStudent.isPresent()) {
+                var s = optStudent.get();
+                return String.format("%d points: Java=%d; DSA=%d; Databases=%d; Spring=%d",
+                        id, s.getJavaPoints(), s.getDsaPoints(), s.getDatabasesPoints(), s.getSpringPoints());
+            }
+            return "No student is found for id=" + id;
+        }
+    }
+  learner_created: true
+- name: src/tracker/Points.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.Arrays;
+
+    public class Points {
+
+        private static final String ERR_MSG = "Incorrect points format.";
+        private static final String NOT_FOUND = "No student is found for id=";
+
+        private Points() {
+        }
+
+        static void find(String input) {
+            try {
+                int id = Integer.parseInt(input);
+                if (Main.data.getIdList().contains(id)) {
+                    Main.lastLog = Main.data.find(id);
+                    System.out.println(Main.lastLog);
+                } else {
+                    Main.lastLog = NOT_FOUND + input;
+                    System.out.println(Main.lastLog);
+                }
+            } catch (IllegalArgumentException e) {
+                Main.lastLog = NOT_FOUND + input; // should not valid id
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        static void addPoints(String[] strPoints) {
+            if (!isInValidPoints(strPoints)) {
+                int[] points = Arrays.stream(strPoints).mapToInt(Integer::parseInt).toArray();
+                Main.data.addPoints(points);
+                Main.lastLog = "Points updated.";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private static boolean isInValidPoints(String[] strPoints) {
+            if (strPoints.length != 5) {
+                Main.lastLog = ERR_MSG;
+                System.out.println(Main.lastLog);
+                return true;
+            } else {
+                int[] points;
+                try {
+                    Integer.parseInt(strPoints[0]);
+                } catch (IllegalArgumentException e) {
+                    Main.lastLog = "No student is found for id=" + strPoints[0];
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                try {
+                    points = Arrays.stream(strPoints).mapToInt(Integer::parseInt).toArray();
+                    if (isNotExistingStudent(points[0])) {
+                        Main.lastLog = "No student is found for id=" + points[0];
+                        System.out.println(Main.lastLog);
+                        return true;
+                    }
+                    if (isInValidPoints(points)) {
+                        Main.lastLog = ERR_MSG;
+                        System.out.println(Main.lastLog);
+                        return true;
+                    }
+                } catch (IllegalArgumentException e) {
+                    Main.lastLog = ERR_MSG;
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private static boolean isNotExistingStudent(int id) {
+            return !Main.data.getIdList().contains(id);
+        }
+
+        private static boolean isInValidPoints(int[] points) {
+            return Arrays.stream(points).anyMatch(p -> p < 0);
+        }
+    }
+  learner_created: true
+- name: src/tracker/StudentBuilder.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.Random;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class StudentBuilder {
+        private static final String NAME_REGEX = "([a-zA-Z]{2})|^[a-zA-Z][-'a-zA-Z ]+[a-zA-Z]$";
+        private static final String ADJACENT_CHARACTERS_REGEX = "-{2,}|'{2,}|-'|'-|_{2,}|\\.{2,}";
+        private static final String EMAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
+        private static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
+        private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+        private static final Pattern ADJACENT_PATTERN = Pattern.compile(ADJACENT_CHARACTERS_REGEX);
+        private static final Random random = new Random();
+        private static final int ID_LENGTH = 6;
+
+        private StudentBuilder() {
+        }
+
+        static void createNewStudent(String[] credentials) {
+            if (!isInValidCredentials(credentials)) {
+                Main.data.addStudent(new Student(createNewId(), credentials[0], credentials[1], credentials[2]));
+                Main.lastLog = "The student has been added.";
+                System.out.println(Main.lastLog);
+            }
+        }
+
+        private static int createNewId() {
+            StringBuilder idBuilder = new StringBuilder("1");
+            for (int i = 0; i < ID_LENGTH - 1; i++) {
+                idBuilder.append(random.nextInt(9));
+            }
+            int id = Integer.parseInt(idBuilder.toString());
+            if (Main.data.getIdList().contains(id)) {
+                return createNewId();
+            }
+            return id;
+        }
+
+
+        private static boolean isInValidCredentials(String[] credentials) {
+            if (credentials.length != 3) {
+                Main.lastLog = "Incorrect credentials.";
+                System.out.println(Main.lastLog);
+                return true;
+            } else {
+                if (isInValidName(credentials[0])) {
+                    Main.lastLog = "Incorrect first name.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isInValidName(credentials[1])) {
+                    Main.lastLog = "Incorrect last name.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isInValidEmail(credentials[2])) {
+                    Main.lastLog = "Incorrect email.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                } else if (isTakenEmail(credentials[2])) {
+                    Main.lastLog = "This email is already taken.";
+                    System.out.println(Main.lastLog);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+
+        private static boolean isTakenEmail(String email) {
+            return Main.data.getEmailList().contains(email);
+        }
+
+        private static boolean isInValidName(String name) {
+            Matcher nameMatcher = NAME_PATTERN.matcher(name);
+            Matcher adjacentCharacterMatcher = ADJACENT_PATTERN.matcher(name);
+            if (nameMatcher.matches()) {
+                return adjacentCharacterMatcher.find();
+            } else {
+                return true;
+            }
+        }
+
+        private static boolean isInValidEmail(String email) {
+            Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
+            Matcher adjacentCharacterMatcher = ADJACENT_PATTERN.matcher(email);
+            if (emailMatcher.matches()) {
+                return adjacentCharacterMatcher.find();
+            } else {
+                return true;
+            }
+        }
+
+
+    }
+  learner_created: true
+- name: src/tracker/Command.java
+  visible: true
+  text: |
+    package tracker;
+
+    import java.util.List;
+
+    public enum Command {
+        ADD_STUDENTS,
+        LIST,
+        ADD_POINTS,
+        FIND,
+        BACK,
+        EXIT;
+
+        private static final List<String> spaceCommands = List.of("add students", "add points");
+
+        static Command getCommand(String command) {
+            if (spaceCommands.contains(command.toLowerCase())) {
+                return Command.valueOf(command.replace(" ", "_"));
+            }
+            return Command.valueOf(command);
+        }
+    }
+  learner_created: true
+- name: src/tracker/Statistics.java
+  visible: true
+  learner_created: true
+- name: src/tracker/Course.java
+  visible: true
+  text: |
+    package tracker;
+
+    public enum Courses {
+        JAVA,
+        DSA,
+        DATABASES,
+        SPRING
+    }
+  learner_created: true
+- name: src/tracker/points.txt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/14399#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Thu, 26 May 2022 16:27:48 UTC
 record: -1

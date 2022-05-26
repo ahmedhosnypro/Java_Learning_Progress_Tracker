@@ -12,4 +12,8 @@ public class Main {
         System.out.println("Learning Progress Tracker");
         CLI.run();
     }
+
+    static void updateLog(String msg) {
+        lastLog = msg;
+    }
 }

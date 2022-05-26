@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/562390/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Thu, 26 May 2022 05:47:42 UTC
+update_date: Thu, 26 May 2022 15:49:27 UTC
 stages:
 - id: 979
   step: 14396
@@ -13,7 +13,7 @@ stages:
   is_completed: true
 - id: 981
   step: 14398
-  is_completed: false
+  is_completed: true
 - id: 982
   step: 14399
   is_completed: false
@@ -142,40 +142,6 @@ topics:
     theory_id: 3517
   - title: Defining classes
     theory_id: 3618
-  - title: Instance methods
-    theory_id: 3495
-  - title: Constructor
-    theory_id: 3535
-  - title: Access modifiers
-    theory_id: 3589
-  - title: Getters and setters
-    theory_id: 3599
-  - title: Inheritance
-    theory_id: 3583
-  - title: Protected modifier
-    theory_id: 6692
-  - title: Referencing subclass objects
-    theory_id: 3585
-  - title: The Object class
-    theory_id: 3596
-  - title: Objects
-    theory_id: 4727
-  - title: Interface
-    theory_id: 3615
-  - title: Multiple constructors
-    theory_id: 3538
-  - title: The keyword super
-    theory_id: 3588
-  - title: Static members
-    theory_id: 3534
-  - title: Annotations basics
-    theory_id: 3622
-  - title: Hiding and overriding
-    theory_id: 3572
-  - title: Polymorphism
-    theory_id: 3587
-  - title: Boxing and unboxing
-    theory_id: 3595
   1:
   - title: Build tools
     theory_id: 4284

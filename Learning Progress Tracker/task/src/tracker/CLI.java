@@ -1,7 +1,5 @@
 package tracker;
 
-import java.util.Arrays;
-
 public class CLI {
     private CLI() {
     }
@@ -33,6 +31,7 @@ public class CLI {
             case LIST -> list();
             case ADD_POINTS -> addPoints();
             case FIND -> find();
+            case STATISTICS -> statistics();
             case BACK -> back();
             case EXIT -> exit();
         }
@@ -90,6 +89,23 @@ public class CLI {
                 break;
             } else {
                 Points.find(input);
+            }
+        }
+    }
+
+    private static void statistics() {
+        Main.lastLog = "Type the name of a course to see details or 'back' to quit:";
+        System.out.println(Main.lastLog);
+
+        Statistics statistics = new Statistics();
+        statistics.generalStatistics();
+
+        while (true) {
+            String input = Main.scanner.nextLine().trim();
+            if (isKnownCommand(input.toUpperCase()) && Command.getCommand(input.toUpperCase()) == Command.BACK) {
+                break;
+            } else {
+                statistics.courseStatistics(input);
             }
         }
     }

@@ -35,6 +35,7 @@ public class Points {
         }
     }
 
+
     private static boolean isInValidPoints(String[] strPoints) {
         if (strPoints.length != 5) {
             Main.lastLog = ERR_MSG;
@@ -45,14 +46,14 @@ public class Points {
             try {
                 Integer.parseInt(strPoints[0]);
             } catch (IllegalArgumentException e) {
-                Main.lastLog = "No student is found for id=" + strPoints[0];
+                Main.lastLog = NOT_FOUND + strPoints[0];
                 System.out.println(Main.lastLog);
                 return true;
             }
             try {
                 points = Arrays.stream(strPoints).mapToInt(Integer::parseInt).toArray();
                 if (isNotExistingStudent(points[0])) {
-                    Main.lastLog = "No student is found for id=" + points[0];
+                    Main.lastLog = NOT_FOUND+ points[0];
                     System.out.println(Main.lastLog);
                     return true;
                 }
